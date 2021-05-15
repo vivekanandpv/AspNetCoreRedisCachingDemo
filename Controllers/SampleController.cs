@@ -19,7 +19,7 @@ namespace AspNetCoreRedisCachingDemo.Controllers
         public SampleController(IEasyCachingProviderFactory cachingProviderFactory, ICarProvider carProvider)
         {
             _carProvider = carProvider;
-            _cachingProvider = cachingProviderFactory.GetCachingProvider("DefaultRedis");
+            _cachingProvider = cachingProviderFactory.GetCachingProvider("InMemory");
         }
 
         [HttpGet]
@@ -34,7 +34,7 @@ namespace AspNetCoreRedisCachingDemo.Controllers
             else
             {
                 var carFromProvider = _carProvider.Get();
-                _cachingProvider.TrySet("CAR_IN_CACHE", carFromProvider, TimeSpan.FromMinutes(1));
+                _cachingProvider.TrySet("CAR_IN_CACHE", carFromProvider, TimeSpan.FromSeconds(30));
                 return Ok(carFromProvider);
             }
         }
