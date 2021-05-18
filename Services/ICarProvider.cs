@@ -7,12 +7,12 @@ using AspNetCoreRedisCachingDemo.Models;
 
 namespace AspNetCoreRedisCachingDemo.Data
 {
-    public interface ICarProvider
+    public interface ICarService
     {
         Car Get();
     }
 
-    public class CarProvider : ICarProvider
+    public class CarService : ICarService
     {
         public Car Get()
         {

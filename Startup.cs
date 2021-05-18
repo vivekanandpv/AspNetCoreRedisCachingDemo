@@ -1,33 +1,33 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AspNetCoreRedisCachingDemo.Data;
-using EasyCaching.Core.Configurations;
+using AspNetCoreRedisCachingDemo.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace AspNetCoreRedisCachingDemo
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddEasyCaching(options =>
+            services.AddStackExchangeRedisCache(options =>
             {
-                options.UseRedis(redis =>
-                {
-                    redis.DBConfig.Endpoints.Add(new ServerEndPoint("localhost", 6379));
-                    redis.DBConfig.AllowAdmin = true;
-                }, "DefaultRedis");
+                options.Configuration = _configuration["Redis:Host"];
             });
-            services.AddScoped<ICarProvider, CarProvider>();
+            services.AddScoped<ICarService, CarService>();
+            services.AddSingleton<IRedisCacheService, RedisCacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

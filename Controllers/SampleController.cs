@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AspNetCoreRedisCachingDemo.Data;
 using AspNetCoreRedisCachingDemo.Models;
-using EasyCaching.Core;
+using AspNetCoreRedisCachingDemo.Services;
 
 namespace AspNetCoreRedisCachingDemo.Controllers
 {
@@ -14,28 +11,28 @@ namespace AspNetCoreRedisCachingDemo.Controllers
     [ApiController]
     public class SampleController : ControllerBase
     {
-        private readonly ICarProvider _carProvider;
-        private readonly IEasyCachingProvider _cachingProvider;
-        public SampleController(IEasyCachingProviderFactory cachingProviderFactory, ICarProvider carProvider)
+        private readonly ICarService _carService;
+        private readonly IRedisCacheService _redisCacheService;
+        public SampleController(ICarService carProvider, IRedisCacheService redisCacheService)
         {
-            _carProvider = carProvider;
-            _cachingProvider = cachingProviderFactory.GetCachingProvider("DefaultRedis");
+            _carService = carProvider;
+            _redisCacheService = redisCacheService;
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var inCache = _cachingProvider.Exists("CAR_IN_CACHE");
+            var inCache = await _redisCacheService.ExistsAsync("CAR_IN_CACHE");
 
             if (inCache)
             {
-                return Ok(_cachingProvider.Get<Car>("CAR_IN_CACHE").Value);
+                return Ok(await _redisCacheService.GetAsync<Car>("CAR_IN_CACHE"));
             }
             else
             {
-                var carFromProvider = _carProvider.Get();
-                _cachingProvider.TrySet("CAR_IN_CACHE", carFromProvider, TimeSpan.FromMinutes(1));
-                return Ok(carFromProvider);
+                var car = _carService.Get();
+                await _redisCacheService.SetAsync("CAR_IN_CACHE", car, TimeSpan.FromMinutes(1));
+                return Ok(car);
             }
         }
     }
