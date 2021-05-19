@@ -26,7 +26,7 @@ namespace AspNetCoreRedisCachingDemo
             {
                 options.Configuration = _configuration["Redis:Host"];
             });
-            services.AddScoped<ICarService, CarService>();
+            services.AddSingleton<ICarService, CarService>();
             services.AddSingleton<IRedisCacheService, RedisCacheService>();
         }
 

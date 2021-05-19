@@ -29,7 +29,7 @@ namespace AspNetCoreRedisCachingDemo.Services
             return JsonConvert.DeserializeObject<T>(elementString);
         }
 
-        public async Task SetAsync<T>(string cacheKey, T element, DistributedCacheEntryOptions options)
+        private async Task SetAsync<T>(string cacheKey, T element, DistributedCacheEntryOptions options)
         {
             var elementString = JsonConvert.SerializeObject(element);
             var elementBytes = Encoding.UTF8.GetBytes(elementString);
