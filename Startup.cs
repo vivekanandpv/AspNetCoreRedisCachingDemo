@@ -22,12 +22,9 @@ namespace AspNetCoreRedisCachingDemo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = _configuration["Redis:Host"];
-            });
+            services.AddMemoryCache();
             services.AddSingleton<ICarService, CarService>();
-            services.AddSingleton<IRedisCacheService, RedisCacheService>();
+            services.AddSingleton<IMemoryCacheService, MemoryCacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

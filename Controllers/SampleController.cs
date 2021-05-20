@@ -12,8 +12,8 @@ namespace AspNetCoreRedisCachingDemo.Controllers
     public class SampleController : ControllerBase
     {
         private readonly ICarService _carService;
-        private readonly IRedisCacheService _redisCacheService;
-        public SampleController(ICarService carProvider, IRedisCacheService redisCacheService)
+        private readonly IMemoryCacheService _redisCacheService;
+        public SampleController(ICarService carProvider, IMemoryCacheService redisCacheService)
         {
             _carService = carProvider;
             _redisCacheService = redisCacheService;
@@ -22,16 +22,16 @@ namespace AspNetCoreRedisCachingDemo.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var inCache = await _redisCacheService.ExistsAsync("CAR_IN_CACHE");
+            var inCache = _redisCacheService.Exists<Car>("CAR_IN_CACHE");
 
             if (inCache)
             {
-                return Ok(await _redisCacheService.GetAsync<Car>("CAR_IN_CACHE"));
+                return Ok(_redisCacheService.Get<Car>("CAR_IN_CACHE"));
             }
             else
             {
                 var car = _carService.Get();
-                await _redisCacheService.SetAsync("CAR_IN_CACHE", car, TimeSpan.FromMinutes(1));
+                _redisCacheService.Set("CAR_IN_CACHE", car, TimeSpan.FromSeconds(30));
                 return Ok(car);
             }
         }
